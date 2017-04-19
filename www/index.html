@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+ <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="Home page for Onion Corporation" />
+        <meta name="author" content="Onion Corporation" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+        <title>(h)odor</title>
+        <style>
+            html, body {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+        
+            * {
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                font-family: sans-serif;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            
+            #control {
+                height: 100%;
+            }
+            #timer {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                background: #ff0;
+            }
+            #button {
+                font-weight: bold;
+                background-color: #ccdfff;
+                margin: 25px;
+                padding: 25px;
+                border-radius: 5px;
+                text-align: center;
+            }
+            #release {
+                font-weight: bold;
+                background-color: #175488;
+                margin: 25px;
+                padding: 25px;
+                border-radius: 5px;
+                text-align: center;
+            }
+            h1, h2, h3, h4, h5, h6 {
+                font-weight: 400;
+            }
+            
+            .text-center {
+            	text-align: center;
+            }
+            
+            .instruction {
+            	text-align: center;
+            	color: #00c;
+            }
+        </style>
+    </head>
+    <body>
+        <h2 class="text-center">(h)odor</h2>
+
+        <div class="wrapper">
+            <div class="padding-container-15 onion-content">
+                <div id="control">
+                    <p class="instruction">Open</p>
+
+                    <h1 id="button" class="text-center">Sesame</h1>
+					<!-- <h1 id="release" class="text-center">Grabbing!</h1> -->
+                </div>
+            </div>
+        </div>
+
+        <script src="./jquery.js"></script>
+        
+	<script>
+            $(function () {
+                $('#button').on('click', function(e){
+					if(window.XMLHttpRequest)
+						request = new XMLHttpRequest();
+					else
+						request = new ActiveXObject("Microsoft.XMLHTTP");
+					request.open('GET', '/cgi-bin/unlock', false);
+					request.send();
+                });
+            });
+        </script>
+    </body>
+</html>
