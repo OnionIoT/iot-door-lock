@@ -4,6 +4,6 @@ echo "Content-type: application/json"
 echo ""
 echo '{"success":"ok"}'
 
-/www/cgi-bin/door.sh unlock &
+/www/cgi-bin/door.sh &
 
 exit 0

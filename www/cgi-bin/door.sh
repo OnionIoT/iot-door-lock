@@ -26,7 +26,7 @@ else
 		initialState=1 #unlocked
 	else
 		relay-exp -q $CHANNEL $UNLOCKED
-		sleep 5
+		sleep 24
 		relay-exp -q $CHANNEL $LOCKED
 	fi
 fi
