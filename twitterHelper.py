@@ -2,24 +2,29 @@
 import tweepy
 
 # streaming from scratch
+# stream listener
+# TODO: StreamListener object does not support item assignment,
+# so figure out how to dynamically bind methods to the instance
+# http://stackoverflow.com/questions/972/adding-a-method-to-an-existing-object-instance
+class StreamListener(tweepy.StreamListener):
+    def __init__(self, callbacks):
+        for name, callback in callbacks.iteritems():
+            self[name] = callback
+        return
+
 class TwitterApp(object):
     # extend the stream listener class
     # provide a dict of callbacks to extend
     # they must be object methods, so don't forget to include self as the first argument!
-    class StreamListener(tweepy.StreamListener):
-        def __init__(self, callbacks):
-            for name, callback in callbacks.iteritems():
-                self[name] = callback
-            return
-            
+    
     # initialization
     def __init__(self, consumerCredentials, accessCredentials):
         self.authenticateApp(consumerCredentials, accessCredentials)
         
     # authenticate this app    
     def authenticateApp(self, consumerCredentials, accessCredentials):
-        self.auth = tweepy.OAuthHandler(consumerCredentials.consumerKey, consumerCredentials.consumerSecret)
-        self.auth.set_access_token(accessCredentials.accessToken, accessCredentials.accessTokenSecret)
+        self.auth = tweepy.OAuthHandler(consumerCredentials["consumerKey"], consumerCredentials["consumerSecret"])
+        self.auth.set_access_token(accessCredentials["accessToken"], accessCredentials["accessTokenSecret"])
     
     # filter a twitter stream
     # provide a filter type, criteria, and the callbacks for the stream listener

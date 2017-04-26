@@ -3,9 +3,14 @@ import twitterHelper as twitter
 import doorHelper as door
 import configHelper
 
-def stripHashtagSymbols(hashtags):
-    for hashtag in hashtags:
-        hashtag["text"] = hashtag["text"].replace("#", "")
+def stripAtSigns(userId):
+    return userId.replace("@", "")
+
+def stripConfigHashtags(hashtags):
+    ret = {}
+    for hashtag, value in hashtags.iteritems():
+        ret[hashtag] = value.replace("#", "")
+    return ret
     
 def controlDoorViaTwitter(consumerCredentials, accessCredentials, userId, hashtags):
     # initialize and authenticate this twitter app
@@ -30,7 +35,7 @@ def controlDoorViaTwitter(consumerCredentials, accessCredentials, userId, hashta
                 # door.setLock("lock")
                 print "I should lock the door now!"
                 return
-            else if hashtag["text"] == commands["unlock"]:
+            elif hashtag["text"] == commands["unlock"]:
                 # door.setLock("unlock")
                 print "I should unlock the door now!"
                 return
