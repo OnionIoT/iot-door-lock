@@ -14,6 +14,8 @@ def __main__():
         config.hashtags
     )
     
+    # runs automatically in a loop
+    
     
 if __name__ == '__main__':
     __main__()

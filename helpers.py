@@ -1,3 +1,4 @@
+import json
 import twitterHelper as twitter
 import doorHelper as door
 import configHelper
@@ -17,7 +18,8 @@ def controlDoorViaTwitter(consumerCredentials, accessCredentials, userId, hashta
     # set up stream callback overrides
     # when a status is received from the targeted user with the correct hashtag
     def on_status(self, status):
-        print "Tweet from " + userId + " received!"
+        print json.dumps(status)
+        
         # sort the hashtags in order of appearance, just in case they're not
         orderedHashtags = twitter.sortHashTags(status, "appearance")
         
@@ -33,6 +35,9 @@ def controlDoorViaTwitter(consumerCredentials, accessCredentials, userId, hashta
                 print "I should unlock the door now!"
                 return
         
+        # no valid hashtag was found
+        print "No valid hashtag was found."
+        return
     
     # overrides to extend StreamListener
     callbacks = {
