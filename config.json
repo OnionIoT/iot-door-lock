@@ -1,0 +1,15 @@
+{
+    "consumerCredentials":{
+        "consumerKey":"",
+        "consumerSecret":""
+    },
+    "accessCredentials":{
+        "accessToken":"",
+        "accessTokenSecret":""
+    },
+    "userId":"",
+    "hashtags": {
+        "lock": "lock",
+        "unlock":"lock"
+    }
+}
