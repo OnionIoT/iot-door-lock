@@ -3,15 +3,45 @@ import tweepy
 
 # streaming from scratch
 # stream listener
-# TODO: StreamListener object does not support item assignment,
-# so figure out how to dynamically bind methods to the instance
-# http://stackoverflow.com/questions/972/adding-a-method-to-an-existing-object-instance
 class StreamListener(tweepy.StreamListener):
-    def __init__(self, callbacks):
-        for name, callback in callbacks.iteritems():
-            self[name] = callback
-        return
-
+    def __init__(self):
+        # status of overrides
+        # extend with more that you may need:
+        # https://github.com/tweepy/tweepy/blob/master/tweepy/streaming.py
+        self.__overrides = {
+            "on_connect": None,
+            "on_data": None,
+            "on_status": None,
+            "on_error": None,
+        }
+        
+    # add an override for one of the event types above.
+    # callback should take the same arguments as the StreamListener methods
+    # except for the self argument
+    def setEventOverride(self, eventType, callback):
+        overrideType = "on_" + eventType
+        if overrideType in self.__overrides:
+            self.__overrides[overrideType] = callback
+    
+    # overrides
+    # when a new tweet is received
+    def on_status(self, status):
+        if self.__overrides["on_status"] is not None:
+            print "running override for status"
+            self.__overrides["on_status"](status)
+        else:
+            print "no override for status set, returning"
+            return
+    
+    # when a non-200 status code is returned
+    def on_error(self, statusCode):
+        if self.__overrides["on_error"] is not None:
+            self.__overrides["on_error"](statusCode)
+        else:
+            return False
+    # extend with more if necessary
+        
+# main twitter handler class
 class TwitterApp(object):
     # extend the stream listener class
     # provide a dict of callbacks to extend
@@ -23,14 +53,15 @@ class TwitterApp(object):
         
     # authenticate this app    
     def authenticateApp(self, consumerCredentials, accessCredentials):
-        self.auth = tweepy.OAuthHandler(consumerCredentials["consumerKey"], consumerCredentials["consumerSecret"])
-        self.auth.set_access_token(accessCredentials["accessToken"], accessCredentials["accessTokenSecret"])
+        auth = tweepy.OAuthHandler(consumerCredentials["consumerKey"], consumerCredentials["consumerSecret"])
+        auth.set_access_token(accessCredentials["accessToken"], accessCredentials["accessTokenSecret"])
+        self.api = tweepy.API(auth)
     
     # filter a twitter stream
     # provide a filter type, criteria, and the callbacks for the stream listener
-    def filterStream(self, filterType, filterCriteria, callbacks):
-        streamListener = StreamListener(callbacks)
-        stream = tweepy.Stream(auth=self.api.auth, listener=streamListener)
+    def filterStream(self, listener, filterType, filterCriteria):
+        # setup a stream and pass it the listener from the caller
+        stream = tweepy.Stream(auth=self.api.auth, listener=listener)
         
         # filter the stream
         # update with more parameters available, see https://github.com/tweepy/tweepy/blob/master/tweepy/streaming.py

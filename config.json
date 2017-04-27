@@ -7,7 +7,7 @@
         "accessToken":"",
         "accessTokenSecret":""
     },
-    "userId":"",
+    "allowedUsers":[],
     "hashtags": {
         "lock": "lock",
         "unlock":"unlock"
