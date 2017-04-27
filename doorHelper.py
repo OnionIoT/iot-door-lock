@@ -18,5 +18,6 @@ def setLock(status):
         print "Invalid lock command!"
         return False
     # call the command
-    call(baseCommand)
+    # call(baseCommand)
+    print baseCommand
     return

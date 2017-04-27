@@ -1,4 +1,4 @@
-# tweepy method
+# twitter helper using tweepy
 import tweepy
 
 # streaming from scratch

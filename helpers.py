@@ -44,14 +44,14 @@ def processTwitterConfig(app, config):
 # the meat and potatoes
 def controlDoor(twitterApp, allowedUsers, hashtags):
     # initialize stream listener
-    print "initializing listener"
     listener = twitter.StreamListener()
     listener.initOverrides()  
     
     # set up stream callback overrides
     # when a status is received from the targeted user with the correct hashtag
     def on_status(status):
-        print status
+        # print the json of the tweet - debug only
+        # print json.dumps(status._json)
         
         # sort the hashtags in order of appearance, just in case they're not
         orderedHashtags = twitter.sortHashTags(status, "appearance")
@@ -60,12 +60,10 @@ def controlDoor(twitterApp, allowedUsers, hashtags):
         for hashtag in orderedHashtags:
             # prioritize locking
             if hashtag["text"] == hashtags["lock"]:
-                # door.setLock("lock")
-                print "I should lock the door now!"
+                door.setLock(True)
                 return
             elif hashtag["text"] == hashtags["unlock"]:
-                # door.setLock("unlock")
-                print "I should unlock the door now!"
+                door.setLock(False)
                 return
         
         # no valid hashtag was found
@@ -74,7 +72,7 @@ def controlDoor(twitterApp, allowedUsers, hashtags):
     # non-200 responses
     def on_error(status_code):
         if status_code == 420:
-            print "Status code " + status_code + ". Disconnecting and reconnecting backoff strategy."
+            print "Status code " + status_code + ". Disconnecting and reconnecting using backoff strategy."
             return False
     
     # overrides to extend StreamListener
