@@ -1,2 +1,5 @@
 *pyc
 *upload.sh
+env
+*.bak
+config.json

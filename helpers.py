@@ -3,6 +3,9 @@ import twitterHelper as twitter
 import doorHelper as door
 import configHelper
 
+# load the config
+config = configHelper.readConfig()
+
 # remove @ signs from the allowed users config
 def stripAtSigns(allowedUsers):
     ret = []
@@ -17,58 +20,66 @@ def stripConfigHashtags(hashtags):
         ret[hashtag] = value.replace("#", "")
     return ret
 
-# set up stream callback overrides
-# when a status is received from the targeted user with the correct hashtag
-def on_status(status):
-    print json.dumps(status)
-    
-    # sort the hashtags in order of appearance, just in case they're not
-    orderedHashtags = twitter.sortHashTags(status, "appearance")
-    
-    # check hashtags for commands
-    for hashtag in orderedHashtags:
-        # prioritize locking
-        if hashtag["text"] == commands["lock"]:
-            # door.setLock("lock")
-            print "I should lock the door now!"
-            return
-        elif hashtag["text"] == commands["unlock"]:
-            # door.setLock("unlock")
-            print "I should unlock the door now!"
-            return
-    
-    # no valid hashtag was found
-    print "No valid hashtag was found."
-    return
+# get numeric user ids given a list of usernames
+# user id is required for filter(follow="userid")
+def getUserIds(app, users):
+    userIdList = []
+    for user in users:
+        userIdList.append(app.getUserId(user))
+        
+    return userIdList
 
-# non-200 responses
-def on_error(status_code):
-    if status_code == 420:
-        print "Status code 420. Disconnecting and reconnecting backoff strategy"
-        return False
+# process the config file
+def processTwitterConfig(app, config):
+    processed = config
+    # strip @ signs
+    # convert to user id (numeric format)
+    processed["allowedUsers"] = stripAtSigns(config["allowedUsers"])
+    processed["allowedUsers"] = getUserIds(app, config["allowedUsers"])
+    # remove # symbols
+    processed["hashtags"] = stripConfigHashtags(config["hashtags"])
+    
+    return processed
 
 # the meat and potatoes
-def controlDoorViaTwitter(consumerCredentials, accessCredentials, allowedUsers, hashtags):
+def controlDoor(twitterApp, allowedUsers, hashtags):
     # initialize stream listener
     print "initializing listener"
     listener = twitter.StreamListener()
-    # initialize and authenticate this twitter app
-    print "initializing app"
-    app = twitter.TwitterApp(consumerCredentials, accessCredentials)
+    listener.initOverrides()  
     
-    
-    # hashtags for opening the door
-    commands = {
-        "lock": hashtags["lock"],
-        "unlock": hashtags["unlock"]
-    }
+    # set up stream callback overrides
+    # when a status is received from the targeted user with the correct hashtag
+    def on_status(status):
+        print status
+        
+        # sort the hashtags in order of appearance, just in case they're not
+        orderedHashtags = twitter.sortHashTags(status, "appearance")
+        
+        # check hashtags for commands
+        for hashtag in orderedHashtags:
+            # prioritize locking
+            if hashtag["text"] == hashtags["lock"]:
+                # door.setLock("lock")
+                print "I should lock the door now!"
+                return
+            elif hashtag["text"] == hashtags["unlock"]:
+                # door.setLock("unlock")
+                print "I should unlock the door now!"
+                return
+        
+        # no valid hashtag was found
+        return
+
+    # non-200 responses
+    def on_error(status_code):
+        if status_code == 420:
+            print "Status code " + status_code + ". Disconnecting and reconnecting backoff strategy."
+            return False
     
     # overrides to extend StreamListener
-    print "adding overrides"
     listener.setEventOverride("status", on_status)
     listener.setEventOverride("error", on_error)
     
     # filter a twitter stream from the specified user and hashtag
-    # operate the door
-    print "filtering stream"
-    app.filterStream(listener, "follow", allowedUsers)
+    twitterApp.filterStream(listener, "follow", allowedUsers)

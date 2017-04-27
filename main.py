@@ -1,28 +1,24 @@
 import helpers
-import configHelper
-config = configHelper.readConfig()
 
 import json
 # print json.dumps(config)
 
-# strip any at signs and pound signs that users may have entered in the config file
-config["allowedUsers"] = helpers.stripAtSigns(config["allowedUsers"])
-config["hashtags"] = helpers.stripConfigHashtags(config["hashtags"])
-
 # main function
 def __main__():
-    # print "Cleaned allowedUsers and hashtags:"
-    # print json.dumps(config["allowedUsers"])
-    # print json.dumps(config["hashtags"])
+    # import raw config
+    config = helpers.config
+    
+    # initialize twitter app and API connection
+    twitterApp = helpers.twitter.TwitterApp(config["consumerCredentials"], config["accessCredentials"])
+    
+    # process the config file
+    # need access to Twitter API to resolve usernames to numeric user ids
+    processedConfig = helpers.processTwitterConfig(twitterApp, config)
+    
     
     print "Checking for tweets."
     # begin checking tweets
-    helpers.controlDoorViaTwitter(
-        config["consumerCredentials"],
-        config["accessCredentials"],
-        config["allowedUsers"],
-        config["hashtags"]
-    )
+    helpers.controlDoor(twitterApp, processedConfig["allowedUsers"], processedConfig["hashtags"])
     
     # runs forever
 

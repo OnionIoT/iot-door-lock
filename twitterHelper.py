@@ -4,10 +4,9 @@ import tweepy
 # streaming from scratch
 # stream listener
 class StreamListener(tweepy.StreamListener):
-    def __init__(self):
-        # status of overrides
-        # extend with more that you may need:
-        # https://github.com/tweepy/tweepy/blob/master/tweepy/streaming.py
+    # had trouble with extending __init__() using super()
+    # so call this function immediately after instantiating
+    def initOverrides(self):
         self.__overrides = {
             "on_connect": None,
             "on_data": None,
@@ -27,10 +26,8 @@ class StreamListener(tweepy.StreamListener):
     # when a new tweet is received
     def on_status(self, status):
         if self.__overrides["on_status"] is not None:
-            print "running override for status"
             self.__overrides["on_status"](status)
         else:
-            print "no override for status set, returning"
             return
     
     # when a non-200 status code is returned
@@ -43,12 +40,9 @@ class StreamListener(tweepy.StreamListener):
         
 # main twitter handler class
 class TwitterApp(object):
-    # extend the stream listener class
-    # provide a dict of callbacks to extend
-    # they must be object methods, so don't forget to include self as the first argument!
-    
     # initialization
     def __init__(self, consumerCredentials, accessCredentials):
+        # authenticate
         self.authenticateApp(consumerCredentials, accessCredentials)
         
     # authenticate this app    
@@ -57,8 +51,15 @@ class TwitterApp(object):
         auth.set_access_token(accessCredentials["accessToken"], accessCredentials["accessTokenSecret"])
         self.api = tweepy.API(auth)
     
+    # get numeric user id that is required by some of the tweepy APIs
+    def getUserId(self, screenname):
+        user = self.api.get_user(screenname)
+        if user is not None:
+            return user.id_str
+        return None
+    
     # filter a twitter stream
-    # provide a filter type, criteria, and the callbacks for the stream listener
+    # provide a filter type, corresponding criteria, and a listener with callbacks setup
     def filterStream(self, listener, filterType, filterCriteria):
         # setup a stream and pass it the listener from the caller
         stream = tweepy.Stream(auth=self.api.auth, listener=listener)
@@ -69,13 +70,12 @@ class TwitterApp(object):
             stream.filter(follow=filterCriteria)
         elif filterType == 'track':
             stream.filter(track=filterCriteria)
-            
         
 # helper functions for processing tweets
 # sort hashtags
 def sortHashTags(tweet, order):
     if order == "appearance":
-        return sorted(tweet.entities.hashtags, key=lambda x: x["indices"][0])
+        return sorted(tweet.entities["hashtags"], key=lambda x: x["indices"][0])
     # add more types of sorting later
     
     else:
