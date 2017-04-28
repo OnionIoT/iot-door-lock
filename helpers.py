@@ -53,10 +53,16 @@ def controlDoor(twitterApp, allowedUsers, hashtags):
         # print the json of the tweet - debug only
         # print json.dumps(status._json)
         
+        # check if they're in the authorized users list
+        if status.user.id_str not in allowedUsers:
+            print "Unauthorized user @" + status.user.screen_name + ", ID: " + status.user.id_str
+            return
+        
         # sort the hashtags in order of appearance, just in case they're not
         orderedHashtags = twitter.sortHashTags(status, "appearance")
         
         # check hashtags for commands
+        
         for hashtag in orderedHashtags:
             # prioritize locking
             if hashtag["text"] == hashtags["lock"]:
@@ -78,7 +84,7 @@ def controlDoor(twitterApp, allowedUsers, hashtags):
     # non-200 responses
     def on_error(status_code):
         if status_code == 420:
-            print "Status code " + status_code + ". Disconnecting and reconnecting using backoff strategy."
+            print "Status code " + str(status_code) + ". Disconnecting and reconnecting using backoff strategy."
             return False
     
     # overrides to extend StreamListener
