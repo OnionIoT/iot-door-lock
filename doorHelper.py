@@ -9,11 +9,13 @@ def setLock(status):
     baseCommand = ["sh", "/www/cgi-bin/door.sh"]
     
     # determine the arguments to send
-    if status == True:
+    if status == "lock":
         baseCommand.append("lock")
-    elif status == False:
+    elif status == "unlock":
         baseCommand.append("unlock")
     # if no valid arguments, do nothing
+    elif status == "toggle":
+        pass   # call the script without any commands to briefly open and close the lock
     else:
         print "Invalid lock command!"
         return False
