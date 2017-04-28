@@ -9,7 +9,8 @@
     },
     "allowedUsers":[],
     "hashtags": {
-        "lock": "lock",
-        "unlock":"unlock"
+        "lock": "#lock",
+        "unlock":"#unlock",
+        "toggle":"#toggle"
     }
 }

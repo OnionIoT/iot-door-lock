@@ -60,12 +60,15 @@ def controlDoor(twitterApp, allowedUsers, hashtags):
         for hashtag in orderedHashtags:
             # prioritize locking
             if hashtag["text"] == hashtags["lock"]:
+                print "Lock command received."
                 door.setLock("lock")
                 return
             elif hashtag["text"] == hashtags["unlock"]:
+                print "Unlock command received."
                 door.setLock("unlock")
                 return
             elif hashtag["text"] == hashtags["toggle"]:
+                print "Toggle command received."
                 door.setLock("toggle")
                 return
         
