@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# set the time delay for the toggle
+TOGGLE_TIME=24
+
 # set the relay channel
 CHANNEL=0
 
@@ -26,7 +30,7 @@ else
 		initialState=1 #unlocked
 	else
 		relay-exp -q $CHANNEL $UNLOCKED
-		sleep 24
+		sleep $TOGGLE_TIME
 		relay-exp -q $CHANNEL $LOCKED
 	fi
 fi
